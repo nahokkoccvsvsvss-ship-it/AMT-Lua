@@ -1,0 +1,51 @@
+-- إنشاء الأداة المخصصة للتحديد الذكي
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local backpack = player:WaitForChild("Backpack")
+
+-- منع تكرار الأداة في الشنطة
+if backpack:FindFirstChild("Click Destroyer") or (player.Character and player.Character:FindFirstChild("Click Destroyer")) then
+    return
+end
+
+local Tool = Instance.new("Tool")
+Tool.Name = "Click Destroyer"
+Tool.RequiresHandle = true
+
+-- إنشاء شكل الأداة في يدك
+local Handle = Instance.new("Part")
+Handle.Name = "Handle"
+Handle.Size = Vector3.new(0.8, 0.8, 1.5)
+Handle.BrickColor = BrickColor.new("Plum") -- لون بنفسجي فخم متناسق مع الهاب حقك
+Handle.Material = Enum.Material.Neon
+Handle.Parent = Tool
+
+-- دالة التدمير عند الضغط والتحديد (تشتغل عندك أنت بس)
+Tool.Activated:Connect(function()
+    -- تحديد البلوكة اللي ضغطت عليها بالضبط
+    local target = mouse.Target
+    
+    -- الشروط: التأكد أنك ضغطت على شيء، وأن الشيء هذا مو لاعبك، ومو الأرض الأساسية للماب
+    if target and not target:IsDescendantOf(player.Character) and target.Name ~= "BasePlate" and target.Name ~= "Terrain" then
+        
+        -- حركات مؤثرات بصرية فخمة (تأثير اختفاء نيون قبل التدمير)
+        pcall(function()
+            target.Material = Enum.Material.Neon
+            target.BrickColor = BrickColor.new("Really red") -- تقلب أحمر إشارة إلى أنها بتدمر
+            task.wait(0.05) -- لمح البصر
+            target:Destroy() -- تختفي تماماً عندك
+        end)
+        
+    end
+end)
+
+-- وضع الأداة في الشنطة فوراً
+Tool.Parent = backpack
+
+-- إشعار تأكيدي في الشاشة من تحت
+local StarterGui = game:GetService("StarterGui")
+StarterGui:SetCore("SendNotification", {
+    Title = "Target Destroyer",
+    Text = "شيل الأداة واضغط على البلوكة اللي تبي تحذفها بس!",
+    Duration = 4
+})
